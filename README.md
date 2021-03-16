@@ -6,4 +6,4 @@
 
 ##### Certificate:
 
-Get `smart-mobile-application-de8a1d29af3c.json` from Jian Yiee
+Get `smart-mobile-application-de8a1d29af3c.json` from Me
