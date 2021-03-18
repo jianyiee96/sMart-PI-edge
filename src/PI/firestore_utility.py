@@ -2,7 +2,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-cert_path = "smart-mobile-application-de8a1d29af3c.json"
+cert_path = "files/smart-mobile-application-de8a1d29af3c.json"
 cred = credentials.Certificate(cert_path)
 firebase_admin.initialize_app(cred)
 db = firestore.client()

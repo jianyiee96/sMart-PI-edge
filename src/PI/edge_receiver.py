@@ -1,4 +1,5 @@
-import firestore_utility 
+import firestore_utility as firestore_utility
+import excel_utility as excel_utility
 import serial, pprint
 
 def update_cart_items(cart_name: str, cart_items: dict):
@@ -62,17 +63,9 @@ def get_global_items_dict():
 
 if __name__ == '__main__':
     global_items = get_global_items_dict()
-
     cart_session = dict()
-    device_mapping = dict()
-    item_mapping = dict()
-    device_mapping['getit'] = 'CART_001'
-    item_mapping['A'] = 'MP1WsknTkMqlvom70wDq'
-    item_mapping['B'] = 'OyVCNQgJ80lWy9HjbpvF'
-    item_mapping['C'] = 'PXmYk7IzzsrHFMq5j70o'
-    item_mapping['D'] = 'PXmYk7IzzsrHFMq5j70o'
-    item_mapping['E'] = 'YvxptylcQC7o6s7fK7H9'
-    item_mapping['F'] = 'oZGiQLJMymfo2Mc4KJYm'
+    device_cart_mapping = excel_utility.load_device_cart_mapping()
+    rfid_item_mapping = excel_utility.load_rfid_item_mapping()
 
     ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)
     print("PI-EDGE is running.. Listening on serial port.")
@@ -83,9 +76,9 @@ if __name__ == '__main__':
         if(response != '' and response[0] == '>'):
             response_comp = response[1:].split("=")
 
-            cart_name = device_mapping[response_comp[0]]
+            cart_name = device_cart_mapping[response_comp[0]]
             command = response_comp[1]
-            item = item_mapping[response_comp[2]]
+            item = rfid_item_mapping[response_comp[2]]
             print()
             print(f"Command: {command}")
             print(f"Cart: {cart_name} ({response_comp[0]})")
