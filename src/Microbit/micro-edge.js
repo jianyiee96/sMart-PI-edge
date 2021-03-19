@@ -38,7 +38,6 @@ radio.onReceivedString(function (receivedString) {
         `)
     }
 })
-radio.setTransmitPower(7)
 radio.setGroup(1)
 basic.forever(function () {
     basic.showLeds(`

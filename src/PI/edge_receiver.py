@@ -88,17 +88,16 @@ if __name__ == '__main__':
                 cart_session[cart_name] = dict()
                 print("New session for " +  cart_name)
 
-
-            if(command == 'ADD'):
+            if(command == 'A'):
                 if item in cart_session[cart_name]:
                     cart_session[cart_name][item] += 1
                 else:
                     cart_session[cart_name][item] = 1
-            elif(command == 'REMOVE'):
+            elif(command == 'R'):
                 cart_session[cart_name][item] -= 1
                 if(cart_session[cart_name][item] == 0):
                     cart_session[cart_name].pop(item, None)
-            print(f"{cart_name} all current items:")
+            print(f"{cart_name} all items:")
             pprint.pprint(cart_session[cart_name])
             update_cart_items(cart_name, cart_session[cart_name])
 
