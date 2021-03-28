@@ -6,6 +6,7 @@ On windows:
 ```
 pip install --upgrade firebase-admin
 pip install pandas
+pip install flask
 ```
 
 On Raspberry pi: 
