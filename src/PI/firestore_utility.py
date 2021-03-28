@@ -46,9 +46,9 @@ def register():
 @app.route('/send_notification')
 def send_notification():
     userId = request.args.get('userId')
-    message = request.args.get('message')
+    itemId = request.args.get('itemId')
     print(userId)
-    print(message)
+    print(itemId)
     recipientToken = ''
     for i in tokenDatabase:
         if i['userId'] == userId:
@@ -56,7 +56,7 @@ def send_notification():
     print(recipientToken)
     message = messaging.Message(
         data={
-            'message': message
+            'message': itemId
         },
         token=recipientToken
     )
