@@ -20,3 +20,11 @@ def get_firebase_document_ref(collection: str, document_id: str):
     Returns the Firebase reference of specified collection and document id.
     """
     return db.collection(collection).document(document_id)     
+
+def get_global_items_dict():
+    items_collection_ref = get_firebase_collection_ref("items")
+    items = items_collection_ref.stream()
+    item_dict = dict()
+    for item in items:
+        item_dict[item.id] = item.to_dict()
+    return item_dict
