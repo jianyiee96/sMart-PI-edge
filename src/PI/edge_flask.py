@@ -42,8 +42,13 @@ def path():
     ox = request.args.get('ox')
     oy = request.args.get('oy')
     item = request.args.get('item')
-    dx = request.args.get('dx')
-    dy = request.args.get('dy')
+    if(item is None):
+        print("Item not supplied. Using dx dy instead (deprecated)")
+        dx = request.args.get('dx')
+        dy = request.args.get('dy')
+    else:
+        dx = global_items[item]['posX']
+        dy = global_items[item]['posY']
     print(f"Path request: {ox},{oy} to {dx},{dy}")
     path = path_utility.get_path(int(ox), int(oy), int(dx), int(dy))
     return str(path)
