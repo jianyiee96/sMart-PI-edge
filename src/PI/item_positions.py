@@ -43,5 +43,5 @@ PXmYk7IzzsrHFMq5j70o = 15,16
 RMWLUuACH72OuqSPYQDk = 15,30
 VfgrHcX6LvHuAvkJtdgU = 12,23
 YvxptylcQC7o6s7fK7H9 = 2, 32
-oZGiQLJMymfo2Mc4KJYm = 4, 21
-rxRod7cigQjBK9dDmlHv = 2, 11
+oZGiQLJMymfo2Mc4KJYm = 4, 21 # not in cart
+rxRod7cigQjBK9dDmlHv = 2, 11 # not in cart

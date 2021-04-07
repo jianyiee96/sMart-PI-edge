@@ -1,4 +1,4 @@
-import functools, pprint
+import functools, pprint, json
 from collections import deque
 import copy
 
@@ -53,8 +53,7 @@ def trace_path(grid: list, path: list, curr_point: Point, next_point: Point):
     direction = -1
 
     while(next_step != 0):
-        path.append(f"{curr_point.x},{curr_point.y}")
-
+        path.append({'posX':curr_point.x,'posY':curr_point.y})
         #check left with priority
         if(curr_point.x - 1 >= 0 and grid[curr_point.y][curr_point.x - 1] == next_step and direction == 1):
             next_step = next_step - 1
@@ -95,12 +94,11 @@ def trace_path(grid: list, path: list, curr_point: Point, next_point: Point):
             next_step = next_step - 1
             curr_point = Point(curr_point.x, curr_point.y - 1)
             direction = 4
-        
         else:
-            return ["Unknown error cause: failed to trace"]
-    path.append(f"{curr_point.x},{curr_point.y}")
+            return [path[0]]
+    path.append({'posX':curr_point.x,'posY':curr_point.y})
     return path
-                
+
 def bfs(origin: Point, destination: Point, grid: list):
 
     x_bound = len(grid[0])
@@ -141,86 +139,68 @@ def bfs(origin: Point, destination: Point, grid: list):
                 grid[curr_point.y][curr_point.x - 1] = grid[curr_point.y][curr_point.x] + 1
     return None
 
-def position_correction(ox: int, oy: int):
+def position_correction(x: int, y: int):
 
     x_bound = len(template[0])
     y_bound = len(template)
     adjustment_strength = 1
     while True:
-        if(oy - adjustment_strength >= 0 and template[oy - adjustment_strength][ox] == 0):
-            print(f"Successful adjust 1 {ox}, {oy-adjustment_strength}")
-            return ox, oy-adjustment_strength
+        if(y - adjustment_strength >= 0 and template[y - adjustment_strength][x] == 0):
+            return x, y-adjustment_strength
             
-        if(oy + adjustment_strength < y_bound and template[oy + adjustment_strength][ox] == 0):
-            print(f"Successful adjust 2  {ox}, {oy+adjustment_strength}")
-            return ox, oy+adjustment_strength
+        if(y + adjustment_strength < y_bound and template[y + adjustment_strength][x] == 0):
+            return x, y+adjustment_strength
             
-        if(ox - adjustment_strength >= 0 and template[oy][ox - adjustment_strength] == 0):
-            print(f"Successful adjust 3  {ox-adjustment_strength}, {oy}")
-            return ox-adjustment_strength, oy
+        if(x - adjustment_strength >= 0 and template[y][x - adjustment_strength] == 0):
+            return x-adjustment_strength, y
             
-        if(ox + adjustment_strength < x_bound and template[oy][ox + adjustment_strength] == 0):
-            print(f"Successful adjust 4 {ox+adjustment_strength}, {oy}")
-            return ox+adjustment_strength, oy
+        if(x + adjustment_strength < x_bound and template[y][x + adjustment_strength] == 0):
+            return x+adjustment_strength, y
         
         adjustment_strength = adjustment_strength+1
 
         if(adjustment_strength > x_bound or adjustment_strength > y_bound):
             break
-    print("Failed to adjust")
-    return ox, oy
+    return x, y
 
 def get_path(ox: int, oy: int, dx: int, dy: int):
-    try:
-        grid = copy.deepcopy(template)
-        print(f"Map dimension: {len(grid[0])}x{len(grid)}")
-        x_bound = len(grid[0])
-        y_bound = len(grid)
-
+    grid = copy.deepcopy(template)
+    print(f"Map dimension: {len(grid[0])}x{len(grid)}")
+    x_bound = len(grid[0])
+    y_bound = len(grid)
+    
+    if(ox >= x_bound): ox = x_bound-1
+    if(dx >= x_bound): dx = x_bound-1
+    if(oy >= y_bound): oy = y_bound-1
+    if(dy >= y_bound): dy = y_bound-1
+    if(ox < 0): ox = 0
+    if(dx < 0): dx = 0
+    if(oy < 0): oy = 0
+    if(dy < 0): dy = 0
+    if(grid[oy][ox] < 0):
+        ox, oy = position_correction(ox, oy)
+    if(grid[dy][dx] < 0):
+        dx, dy = position_correction(dx, dy)
         
-        if(ox >= x_bound): ox = x_bound-1
-        if(dx >= x_bound): dx = x_bound-1
-        if(oy >= y_bound): oy = y_bound-1
-        if(dy >= y_bound): dy = y_bound-1
-        if(ox < 0): ox = 0
-        if(dx < 0): dx = 0
-        if(oy < 0): oy = 0
-        if(dy < 0): dy = 0
+    grid[dy][dx] = 1
+    grid[oy][ox] = x_bound*y_bound
+    origin = Point(ox,oy)
+    destination = Point(dx,dy)
 
-        if(ox == dx and oy == dy):
-            print("Same position")
-            return ["Same position"]
-        elif(grid[oy][ox] < 0):
-            print("Adjustment required")
-            ox, oy = position_correction(ox, oy)
-            print(f"New x:{ox} y:{oy}")
-        elif(grid[dy][dx] < 0):
-            print("invalid destination point")
-            return ["invalid destination point"]
-            
-        grid[dy][dx] = 1
-        grid[oy][ox] = x_bound*y_bound
-        origin = Point(ox,oy)
-        destination = Point(dx,dy)
+    print(f"Finding path from ({ox},{oy}) to ({dx},{dy})")
 
-        print(f"Finding path from ({ox},{oy}) to ({dx},{dy})")
-
-        result = bfs(origin, destination, grid)
-        pprint.pprint(grid)
-        
-        path = list()
-        if(result is not None):
-            print("Found path! Tracing path...")
-            path = trace_path(grid, path, origin, result)
-        else:
-            print("Unable to find path.")
-        return path
-    except:
-        return print(["Please supply arguments"])
+    result = bfs(origin, destination, grid)
+    
+    path = list()
+    if(result is not None):
+        path = trace_path(grid, path, origin, result)
+    return path
 
 def apply_path(path: list):
     grid = copy.deepcopy(template)
-    path_s = set(path)
+    path_s = set()
+    for p in path:
+        path_s.add(f"{p['posX']},{p['posY']}")
     for i in range(len(grid)):
         for j in range(len(grid[0])):
             if(f"{j},{i}" in path_s):
