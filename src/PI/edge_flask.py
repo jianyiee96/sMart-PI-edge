@@ -2,9 +2,9 @@ from flask import Flask, redirect, url_for, request
 import firestore_utility as firestore_utility
 import path_utility as path_utility
 
-
 app = Flask(__name__)
 token_database = []
+global_items = firestore_utility.get_global_items_dict()
 
 @app.route("/")
 def index():
@@ -41,6 +41,7 @@ def send_notification():
 def path():
     ox = request.args.get('ox')
     oy = request.args.get('oy')
+    item = request.args.get('item')
     dx = request.args.get('dx')
     dy = request.args.get('dy')
     print(f"Path request: {ox},{oy} to {dx},{dy}")
@@ -51,8 +52,15 @@ def path():
 def path_ui():
     ox = request.args.get('ox')
     oy = request.args.get('oy')
-    dx = request.args.get('dx')
-    dy = request.args.get('dy')
+    item = request.args.get('item')
+    if(item is None):
+        print("Item not supplied. Using dx dy instead (deprecated)")
+        dx = request.args.get('dx')
+        dy = request.args.get('dy')
+    else:
+        dx = global_items[item]['posX']
+        dy = global_items[item]['posY']
+
     print(f"Path2 request: {ox},{oy} to {dx},{dy}")
     path = path_utility.get_path(int(ox), int(oy), int(dx), int(dy))
     if(len(path) == 1):

@@ -101,7 +101,6 @@ def trace_path(grid: list, path: list, curr_point: Point, next_point: Point):
     path.append(f"{curr_point.x},{curr_point.y}")
     return path
                 
-
 def bfs(origin: Point, destination: Point, grid: list):
 
     x_bound = len(grid[0])
@@ -142,8 +141,35 @@ def bfs(origin: Point, destination: Point, grid: list):
                 grid[curr_point.y][curr_point.x - 1] = grid[curr_point.y][curr_point.x] + 1
     return None
 
+def position_correction(ox: int, oy: int):
 
-@functools.lru_cache()
+    x_bound = len(template[0])
+    y_bound = len(template)
+    adjustment_strength = 1
+    while True:
+        if(oy - adjustment_strength >= 0 and template[oy - adjustment_strength][ox] == 0):
+            print(f"Successful adjust 1 {ox}, {oy-adjustment_strength}")
+            return ox, oy-adjustment_strength
+            
+        if(oy + adjustment_strength < y_bound and template[oy + adjustment_strength][ox] == 0):
+            print(f"Successful adjust 2  {ox}, {oy+adjustment_strength}")
+            return ox, oy+adjustment_strength
+            
+        if(ox - adjustment_strength >= 0 and template[oy][ox - adjustment_strength] == 0):
+            print(f"Successful adjust 3  {ox-adjustment_strength}, {oy}")
+            return ox-adjustment_strength, oy
+            
+        if(ox + adjustment_strength < x_bound and template[oy][ox + adjustment_strength] == 0):
+            print(f"Successful adjust 4 {ox+adjustment_strength}, {oy}")
+            return ox+adjustment_strength, oy
+        
+        adjustment_strength = adjustment_strength+1
+
+        if(adjustment_strength > x_bound or adjustment_strength > y_bound):
+            break
+    print("Failed to adjust")
+    return ox, oy
+
 def get_path(ox: int, oy: int, dx: int, dy: int):
     try:
         grid = copy.deepcopy(template)
@@ -151,32 +177,36 @@ def get_path(ox: int, oy: int, dx: int, dy: int):
         x_bound = len(grid[0])
         y_bound = len(grid)
 
+        
+        if(ox >= x_bound): ox = x_bound-1
+        if(dx >= x_bound): dx = x_bound-1
+        if(oy >= y_bound): oy = y_bound-1
+        if(dy >= y_bound): dy = y_bound-1
+        if(ox < 0): ox = 0
+        if(dx < 0): dx = 0
+        if(oy < 0): oy = 0
+        if(dy < 0): dy = 0
+
         if(ox == dx and oy == dy):
             print("Same position")
             return ["Same position"]
-        elif(ox >= x_bound or dx >= x_bound):
-            print("exceed boundaries")
-            return ["exceed boundaries"]
-        elif(oy >= y_bound or dy >= y_bound):
-            print("exceed boundaries")
-            return ["exceed boundaries"]
         elif(grid[oy][ox] < 0):
-            print("invalid origin point")
-            return ["invalid origin point"]
+            print("Adjustment required")
+            ox, oy = position_correction(ox, oy)
+            print(f"New x:{ox} y:{oy}")
         elif(grid[dy][dx] < 0):
             print("invalid destination point")
             return ["invalid destination point"]
-        else:
-            grid[dy][dx] = 1
-            grid[oy][ox] = x_bound*y_bound
-
+            
+        grid[dy][dx] = 1
+        grid[oy][ox] = x_bound*y_bound
         origin = Point(ox,oy)
         destination = Point(dx,dy)
 
         print(f"Finding path from ({ox},{oy}) to ({dx},{dy})")
 
         result = bfs(origin, destination, grid)
-        # pprint.pprint(grid)
+        pprint.pprint(grid)
         
         path = list()
         if(result is not None):
