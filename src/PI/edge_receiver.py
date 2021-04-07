@@ -21,19 +21,23 @@ def update_cart_items(cart_name: str, cart_items: dict):
         return None
 
     cart_items_ref = firestore_utility.get_firebase_document_ref("users", user_id).collection("cartItems")
-
+    
+    # items from firestore
     items = cart_items_ref.stream()
     
     for item in items:
         curr_item_dict = item.to_dict()
-
+        # cart_items ref to items in basket
         if item.id in cart_items:
             if curr_item_dict['quantityInCart'] != cart_items[item.id]:
+                # updating quantity if changed
                 curr_item_dict['quantityInCart'] = cart_items[item.id]
                 cart_items_ref.document(item.id).set(curr_item_dict)
         elif curr_item_dict['quantity'] == 0:
+            # when he doesnt want the item then he removes item
             cart_items_ref.document(item.id).delete()
         elif curr_item_dict['quantity'] != 0:
+            # user wants item but item not in basket
             if curr_item_dict['quantityInCart'] != 0:
                 curr_item_dict['quantityInCart'] = 0
                 cart_items_ref.document(item.id).set(curr_item_dict)

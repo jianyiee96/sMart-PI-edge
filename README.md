@@ -6,6 +6,7 @@ On windows:
 ```
 pip install --upgrade firebase-admin
 pip install pandas
+pip install flask
 ```
 
 On Raspberry pi: 
@@ -59,6 +60,7 @@ Connect Micro:bit edge device to Raspberry PI using USB.
 | edge_receiver.py     	| Main executable file for Raspberry PI device      	|
 | excel_utility.py     	| Utility tool for reading sheets from mapping.xlsx 	|
 | firestore_utility.py 	| Utility tool for connection with Firestore        	|
+| edge_flask.py         | Flask Web Server for sMart                            |
 
 ###### /Arduino
 
