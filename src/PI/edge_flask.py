@@ -4,7 +4,7 @@ import path_utility as path_utility
 import json, pprint
 
 app = Flask(__name__)
-token_database = []
+token_database = dict()
 global_items = firestore_utility.get_global_items_dict()
 position_item = dict()
 for key in global_items.keys():
@@ -19,7 +19,7 @@ def index():
 def register():
     user_id = request.args.get('userId')
     fcm_token = request.args.get('fcmToken')
-    token_database.append({"userId": user_id, "token": fcm_token})
+    token_database[user_id] = fcm_token
     print(f"New Token Registered: User ID: {user_id}, Token: {fcm_token}")
     return user_id + ", " + fcm_token
 
@@ -27,15 +27,11 @@ def register():
 def send_notification():
     user_id = request.args.get('userId')
     item_id = request.args.get('itemId')
-    recipient_token = ''
-    for i in token_database:
-        if i['userId'] == user_id:
-            recipient_token = i['token']
     message = firestore_utility.messaging.Message(
         data={
             'message': item_id
         },
-        token=recipient_token
+        token=global_items[user_id]
     )
     print(message)
     response = firestore_utility.messenging.send(message)
