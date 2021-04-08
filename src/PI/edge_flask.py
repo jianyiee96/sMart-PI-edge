@@ -75,8 +75,8 @@ def path():
     recommend_trigger = item_in_path - user_incart_items
     print(f"Item in path: {item_in_path}")
     print(f"Item in cart: {user_incart_items}")
-    print(f"Item to trigger recommendation: {recommend_trigger}") # do api call with this
-    return json.dumps({'item':item,'path':path,'recommendations':list(recommend_trigger)})
+    print(f"Item to trigger recommendation: {recommend_trigger}") # TO-DO add api call here
+    return json.dumps({'item':item,'path':path})
 
 @app.route('/path2')
 def path_ui():
