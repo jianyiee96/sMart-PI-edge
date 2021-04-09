@@ -21,54 +21,6 @@ def get_firebase_document_ref(collection: str, document_id: str):
     """
     return db.collection(collection).document(document_id)     
 
-<<<<<<< HEAD
-
-# notifs
-
-from flask import Flask, redirect, url_for, request
-app = Flask(__name__)
-
-@app.route("/")
-def index():
-    return '''
-<p>Hello World!</p>
-'''
-
-@app.route('/register')
-def register():
-    userId = request.args.get('userId')
-    fcmToken = request.args.get('fcmToken')
-    tokenDatabase.append({"userId": userId, "token": fcmToken})
-    print("New Token Registered:: User ID: ", userId, ", Token:", fcmToken)
-    print(tokenDatabase)
-    return userId + ", " + fcmToken
-
-@app.route('/send_notification')
-def send_notification():
-    userId = request.args.get('userId')
-    itemId = request.args.get('itemId')
-    print(userId)
-    print(itemId)
-    recipientToken = ''
-    for i in tokenDatabase:
-        if i['userId'] == userId:
-            recipientToken = i['token']
-    print(recipientToken)
-    message = messaging.Message(
-        data={
-            'message': itemId
-        },
-        token=recipientToken
-    )
-    print(message)
-
-    response = messaging.send(message)
-    print('Successfully sent message:', response)
-    return response
-
-if __name__ == '__main__':
-   app.run(debug = True)
-=======
 def get_global_items_dict():
     items_collection_ref = get_firebase_collection_ref("items")
     items = items_collection_ref.stream()
@@ -76,4 +28,3 @@ def get_global_items_dict():
     for item in items:
         item_dict[item.id] = item.to_dict()
     return item_dict
->>>>>>> 94d5b83c778538bd1fdfa3dbe7afa768cb0e4fa2
