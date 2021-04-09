@@ -28,3 +28,14 @@ def get_global_items_dict():
     for item in items:
         item_dict[item.id] = item.to_dict()
     return item_dict
+
+def get_user_fms_token(user_id: str):
+    return get_firebase_document_ref("users", user_id).get(field_paths={"fms_token"}).to_dict()['fms_token']
+
+def get_user_incart_items(user_id: str):
+    cart_items_ref = get_firebase_document_ref("users", user_id).collection("cartItems")
+    user_incart_items = set()
+    items = cart_items_ref.stream()
+    for i in items:
+        user_incart_items.add(i.id)
+    return user_incart_items

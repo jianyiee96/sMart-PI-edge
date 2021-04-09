@@ -1,11 +1,51 @@
 import firestore_utility
 import pandas as pd
-import requests
 import numpy as np
+import requests
 
 items = firestore_utility.get_global_items_dict()
 df = pd.DataFrame.from_dict(items, orient='index')
 tx_history = [];
+
+# Put a 5 minutes check so user dont get more than 1 recommendation in 5 minutes window.
+# Recommendation history is used to prevent user from getting repeated recommendation for REC_TYPE an REC_ITEM
+# For each Recommendation, check through this reocmmendation history
+recommendation_history = {
+    'user_id' : [
+        {"rec_type" : "path",
+        "rec_item" : "item_id 1",
+        "timestamp" : "12:00pm"
+        },
+        {"rec_type" : "adding_item",
+        "rec_item" : "item_id 2",
+        "timestamp" : "12:30pm"
+        },
+    ],
+    'user_id 2' : [
+        {"rec_type" : "path",
+        "rec_item" : "item_id 1",
+        "timestamp" : "12:00pm"
+        },
+        {"rec_type" : "adding_item",
+        "rec_item" : "item_id 2",
+        "timestamp" : "12:30pm"
+        },
+    ],
+}
+
+def reset_user_recommendation(user: str):
+    recommendation_history[user] = list()
+
+def send_notification(user: str, header: str, message: str, item: str):
+    message = firestore_utility.messaging.Message(
+        data={
+            'header' : header,
+            'message': message,
+            'itemId': item
+        },
+        token=firestore_utility.get_user_fms_token(user)
+    )
+    firestore_utility.messaging.send(message)
 
 # returns the item_id of the item with the max price in the category
 def item_id_with_max_price(category):
@@ -61,9 +101,3 @@ def recommend_bigger_purchase_from_past_purchases():
 
 def recommend_monthly_purchase():
     return
-
-# load and send the notification payload
-def load_notification_payload(user_id, item_id):
-    payload = {'userId': user_id, 'itemId': item_id}
-    r = requests.get('http://localhost:5000/send_notification', params=payload)
-    print(r.url)

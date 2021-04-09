@@ -209,3 +209,19 @@ def apply_path(path: list):
                 grid[i][j] = " "
     # pprint.pprint(grid, width=1000)
     return pprint.pformat(grid, width=1000)
+
+def items_nearby(position_item: dict, x:int, y:int):
+    items = set()
+    x_bound = len(template[0])
+    y_bound = len(template)
+    if f"{x},{y}" in position_item:
+        items.add(position_item[f"{x},{y}"])
+    if x+1 < x_bound and f"{x+1},{y}" in position_item:
+        items.add(position_item[f"{x+1},{y}"])
+    if x-1 >= 0 and f"{x-1},{y}" in position_item:
+        items.add(position_item[f"{x-1},{y}"])
+    if y+1 < y_bound and f"{x},{y+1}" in position_item:
+        items.add(position_item[f"{x},{y+1}"])
+    if y-1 >= 0 and f"{x},{y-1}" in position_item:
+        items.add(position_item[f"{x},{y-1}"])
+    return items

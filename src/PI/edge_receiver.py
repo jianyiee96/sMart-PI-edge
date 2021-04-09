@@ -83,6 +83,12 @@ if __name__ == '__main__':
                     cart_session[cart_name][item] += 1
                 else:
                     cart_session[cart_name][item] = 1
+
+                # TO-DO add recommendation api call here
+                # Find the user_id based on cart_name using the mapping. USE: get_cart_current_user
+                # Use firestore_utility to get user' incart item
+                # Added MILO. Want to recommend HOLICK. Check if user has holick in his shopping list / cart. 
+
             elif(command == 'R'):
                 cart_session[cart_name][item] -= 1
                 if(cart_session[cart_name][item] == 0):
