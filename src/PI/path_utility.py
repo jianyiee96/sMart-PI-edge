@@ -113,28 +113,28 @@ def bfs(origin: Point, destination: Point, grid: list):
         if(curr_point.y - 1 >= 0):
             if(grid[curr_point.y - 1][curr_point.x] == origin_value):
                 return curr_point
-            elif(grid[curr_point.y - 1][curr_point.x] == 0):
+            if(grid[curr_point.y - 1][curr_point.x] == 0):
                 q.appendleft(Point(curr_point.x, curr_point.y - 1))
                 grid[curr_point.y - 1][curr_point.x] = grid[curr_point.y][curr_point.x] + 1
         #check right
         if(curr_point.x + 1 < x_bound):
             if(grid[curr_point.y][curr_point.x + 1] == origin_value):
                 return curr_point
-            elif(grid[curr_point.y][curr_point.x + 1] == 0):
+            if(grid[curr_point.y][curr_point.x + 1] == 0):
                 q.appendleft(Point(curr_point.x + 1, curr_point.y))
                 grid[curr_point.y][curr_point.x + 1] = grid[curr_point.y][curr_point.x] + 1
         #check down
         if(curr_point.y + 1 < y_bound):
             if(grid[curr_point.y + 1][curr_point.x] == origin_value):
                 return curr_point
-            elif(grid[curr_point.y + 1][curr_point.x] == 0):
+            if(grid[curr_point.y + 1][curr_point.x] == 0):
                 q.appendleft(Point(curr_point.x, curr_point.y + 1))
                 grid[curr_point.y + 1][curr_point.x] = grid[curr_point.y][curr_point.x] + 1
         #check left
         if(curr_point.x - 1 >= 0):
             if(grid[curr_point.y][curr_point.x - 1] == origin_value):
                 return curr_point
-            elif(grid[curr_point.y][curr_point.x - 1] == 0):
+            if(grid[curr_point.y][curr_point.x - 1] == 0):
                 q.appendleft(Point(curr_point.x - 1, curr_point.y))
                 grid[curr_point.y][curr_point.x - 1] = grid[curr_point.y][curr_point.x] + 1
     return None
@@ -177,10 +177,8 @@ def get_path(ox: int, oy: int, dx: int, dy: int):
     if(dx < 0): dx = 0
     if(oy < 0): oy = 0
     if(dy < 0): dy = 0
-    if(grid[oy][ox] < 0):
-        ox, oy = position_correction(ox, oy)
-    if(grid[dy][dx] < 0):
-        dx, dy = position_correction(dx, dy)
+    if(grid[oy][ox] < 0): ox, oy = position_correction(ox, oy)
+    if(grid[dy][dx] < 0): dx, dy = position_correction(dx, dy)
         
     grid[dy][dx] = 1
     grid[oy][ox] = x_bound*y_bound
