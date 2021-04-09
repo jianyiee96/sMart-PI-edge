@@ -23,6 +23,9 @@ void loop() {
 }
 
 void transmit_byte_array(byte *buffer, byte bufferSize) {
+    if(bufferSize > 4) {
+        bufferSize = 4;
+    }
     for (byte i = 0; i < bufferSize; i++) {
         if(buffer[i] < 0x10) {
             microbitSerial.print("0");
