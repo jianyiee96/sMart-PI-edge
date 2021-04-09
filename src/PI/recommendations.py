@@ -1,16 +1,11 @@
-import edge_receiver
+import firestore_utility
 import pandas as pd
 import requests
 import numpy as np
 
-print("Hello World!")
-items = edge_receiver.get_global_items_dict()
-# print(items)
+items = firestore_utility.get_global_items_dict()
 df = pd.DataFrame.from_dict(items, orient='index')
-# print(df)
 tx_history = [];
-
-print("DataFrame initialised")
 
 # returns the item_id of the item with the max price in the category
 def item_id_with_max_price(category):
@@ -45,7 +40,6 @@ def recommend_cheapest(item_id, category):
 # checks if item is on promotion or not
 def item_on_promotion(item_id):
     temp_items = df.loc[item_id]
-    # print(temp_items.oldPrice)
     if temp_items.oldPrice != 0:
         return True
     else:
@@ -57,7 +51,6 @@ def recommend_promotion(item_id, category):
         temp_items = df[df['category'] == category]
         print(temp_items)
         for item in temp_items.index:
-            # print(item)
             if item != item_id:
                 if item_on_promotion(item):
                     load_notification_payload(1, item)
@@ -74,17 +67,3 @@ def load_notification_payload(user_id, item_id):
     payload = {'userId': user_id, 'itemId': item_id}
     r = requests.get('http://localhost:5000/send_notification', params=payload)
     print(r.url)
-
-if __name__ == '__main__':
-    print(df)
-    # print(recommend_most_expensive('OyVCNQgJ80lWy9HjbpvF', 'Dairy'))
-    # print(recommend_cheapest('OyVCNQgJ80lWy9HjbpvF', 'Dairy'))
-    # print(item_on_promotion('MP1WsknTkMqlvom70wDq'))
-    # print(item_on_promotion('YvxptylcQC7o6s7fK7H9'))
-    # print(recommend_promotion('YvxptylcQC7o6s7fK7H9','Tissue'))
-    # print(recommend_promotion('MP1WsknTkMqlvom70wDq', 'Tissue'))
-
-
-
-
-
