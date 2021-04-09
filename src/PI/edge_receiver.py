@@ -1,5 +1,5 @@
-import firestore_utility as firestore_utility
-import excel_utility as excel_utility
+import firestore_utility
+import excel_utility
 import serial, pprint
 
 def update_cart_items(cart_name: str, cart_items: dict):
@@ -22,25 +22,19 @@ def update_cart_items(cart_name: str, cart_items: dict):
 
     cart_items_ref = firestore_utility.get_firebase_document_ref("users", user_id).collection("cartItems")
     
-    # items from firestore
     items = cart_items_ref.stream()
     
     for item in items:
         curr_item_dict = item.to_dict()
-        # cart_items ref to items in basket
         if item.id in cart_items:
             if curr_item_dict['quantityInCart'] != cart_items[item.id]:
-                # updating quantity if changed
                 curr_item_dict['quantityInCart'] = cart_items[item.id]
                 cart_items_ref.document(item.id).set(curr_item_dict)
         elif curr_item_dict['quantity'] == 0:
-            # when he doesnt want the item then he removes item
             cart_items_ref.document(item.id).delete()
-        elif curr_item_dict['quantity'] != 0:
-            # user wants item but item not in basket
-            if curr_item_dict['quantityInCart'] != 0:
-                curr_item_dict['quantityInCart'] = 0
-                cart_items_ref.document(item.id).set(curr_item_dict)
+        elif curr_item_dict['quantity'] != 0 and curr_item_dict['quantityInCart'] != 0:
+            curr_item_dict['quantityInCart'] = 0
+            cart_items_ref.document(item.id).set(curr_item_dict)
         
         cart_items.pop(item.id, None)
 
@@ -57,21 +51,13 @@ def get_cart_current_user(cart_name: str):
     except Exception:
         return None
 
-def get_global_items_dict():
-    items_collection_ref = firestore_utility.get_firebase_collection_ref("items")
-    items = items_collection_ref.stream()
-    item_dict = dict()
-    for item in items:
-        item_dict[item.id] = item.to_dict()
-    return item_dict
-
 if __name__ == '__main__':
-    global_items = get_global_items_dict()
+    global_items = firestore_utility.get_global_items_dict()
     cart_session = dict()
     device_cart_mapping = excel_utility.load_device_cart_mapping()
     rfid_item_mapping = excel_utility.load_rfid_item_mapping()
 
-    ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)
+    ser = serial.Serial(port='COM11', baudrate=115200, timeout=1)
     print("PI-EDGE is running.. Listening on serial port.")
     while True:
         

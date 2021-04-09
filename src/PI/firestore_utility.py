@@ -3,9 +3,8 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import messaging
 
-tokenDatabase = []
 
-cert_path = "../../files/smart-mobile-application-de8a1d29af3c.json"
+cert_path = "files/smart-mobile-application-de8a1d29af3c.json"
 cred = credentials.Certificate(cert_path)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
@@ -22,6 +21,7 @@ def get_firebase_document_ref(collection: str, document_id: str):
     """
     return db.collection(collection).document(document_id)     
 
+<<<<<<< HEAD
 
 # notifs
 
@@ -68,3 +68,12 @@ def send_notification():
 
 if __name__ == '__main__':
    app.run(debug = True)
+=======
+def get_global_items_dict():
+    items_collection_ref = get_firebase_collection_ref("items")
+    items = items_collection_ref.stream()
+    item_dict = dict()
+    for item in items:
+        item_dict[item.id] = item.to_dict()
+    return item_dict
+>>>>>>> 94d5b83c778538bd1fdfa3dbe7afa768cb0e4fa2
