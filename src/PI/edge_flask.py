@@ -1,10 +1,9 @@
 from flask import Flask, redirect, url_for, request
-import firestore_utility as firestore_utility
-import path_utility as path_utility
+import firestore_utility
+import path_utility
 import json, pprint
 
 app = Flask(__name__)
-token_database = dict()
 global_items = firestore_utility.get_global_items_dict()
 position_item = dict()
 for key in global_items.keys():
@@ -14,29 +13,6 @@ for key in global_items.keys():
 @app.route("/")
 def index():
     return "Welcome to sMART's Flask Server"
-
-@app.route('/register')
-def register():
-    user_id = request.args.get('userId')
-    fcm_token = request.args.get('fcmToken')
-    token_database[user_id] = fcm_token
-    print(f"New Token Registered: User ID: {user_id}, Token: {fcm_token}")
-    return user_id + ", " + fcm_token
-
-@app.route('/send_notification')
-def send_notification():
-    user_id = request.args.get('userId')
-    item_id = request.args.get('itemId')
-    message = firestore_utility.messaging.Message(
-        data={
-            'message': item_id
-        },
-        token=global_items[user_id]
-    )
-    print(message)
-    response = firestore_utility.messenging.send(message)
-    print(f'Successfully sent message: {response}')
-    return response
 
 @app.route('/path')
 def path():
@@ -55,23 +31,18 @@ def path():
     path = path_utility.get_path(int(ox), int(oy), int(dx), int(dy))
 
     # For recommendation trigger
-    user_incart_items = set()
+    user_incart_items = firestore_utility.get_user_incart_items(user)
     item_in_path = set()
     recommend_trigger = set()
 
-    cart_items_ref = firestore_utility.get_firebase_document_ref("users", user).collection("cartItems")
-    items = cart_items_ref.stream()
-    for i in items:
-        user_incart_items.add(i.id)
-
     for p in path:
-        if f"{p['posX']},{p['posY']}" in position_item:
-            item_in_path.add(position_item[f"{p['posX']},{p['posY']}"])
+        items_nearby = path_utility.items_nearby(position_item, p['posX'], p['posY'])
+        item_in_path = item_in_path.union(items_nearby)
 
     recommend_trigger = item_in_path - user_incart_items
     print(f"Item in path: {item_in_path}")
     print(f"Item in cart: {user_incart_items}")
-    print(f"Item to trigger recommendation: {recommend_trigger}") # TO-DO add api call here
+    print(f"Item to trigger recommendation: {recommend_trigger}") # TO-DO add recommendation api call here
     return json.dumps({'item':item,'path':path})
 
 @app.route('/path2')
