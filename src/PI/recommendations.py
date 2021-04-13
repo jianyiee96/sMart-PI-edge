@@ -63,7 +63,7 @@ def item_id_with_min_price(category):
 def recommend_most_expensive(item_id, category):
     most_expensive_item_id = item_id_with_max_price(category)
     if item_id != most_expensive_item_id:
-        load_notification_payload(1, most_expensive_item_id)
+        # load_notification_payload(1, most_expensive_item_id)
         return most_expensive_item_id
     else:
         return item_id
@@ -72,7 +72,8 @@ def recommend_most_expensive(item_id, category):
 def recommend_cheapest(item_id, category):
     cheapest_item_id = item_id_with_min_price(category)
     if item_id != cheapest_item_id:
-        load_notification_payload(1, cheapest_item_id)
+        # to complete
+        # send_notification()
         return cheapest_item_id
     else:
         return item_id
@@ -85,19 +86,93 @@ def item_on_promotion(item_id):
     else:
         return False
 
-# if the item is not on promotion, recommend all the items that are on promotion
+# if the item is not on promotion, recommend the cheapest item on promotion
 def recommend_promotion(item_id, category):
-    if item_on_promotion(item_id) == False:
-        temp_items = df[df['category'] == category]
-        print(temp_items)
-        for item in temp_items.index:
-            if item != item_id:
-                if item_on_promotion(item):
-                    load_notification_payload(1, item)
-                    print(item)
+    min_item = item_id
+    temp_items = df[df['category'] == category]
+    min_item_price = temp_items['price'].max()
+    for item in temp_items.index:
+        if item != item_id:
+            if item_on_promotion(item):
+                item_price = df.loc[item_id].price
+                if item_price <= min_item_price:
+                    min_item_price = item_price
+                    min_item = item
+    return min_item
+
+def recommend_milk_from_cereal():
+    return 'OyVCNQgJ80lWy9HjbpvF'
 
 def recommend_bigger_purchase_from_past_purchases():
     return
 
 def recommend_monthly_purchase():
     return
+
+def trigger_recommendations(user_id: str, item_id: str):
+    profile_pref = firestore_utility.get_firebase_document_ref("users", user_id).get(field_paths={"profile_habit"}).to_dict()['profile_habit']
+    item_cat = firestore_utility.get_firebase_document_ref("items", item_id).get(field_paths={"category"}).to_dict()['category']
+    print("User Id: ", user_id)
+    print("User profile pref: ", profile_pref)
+    print("Item Id: ", item_id)
+    print("Item Category: ", item_cat)
+
+    items_in_cart = firestore_utility.get_user_incart_items(user_id)
+    print(items_in_cart)
+
+    # only the most expensive items
+    if profile_pref == 'QUALITY':
+        item_to_reco = recommend_most_expensive(item_id, item_cat)
+        item_to_reco_name = firestore_utility.get_firebase_document_ref("items", item_to_reco).get(field_paths={"name"}).to_dict()[
+            'name']
+        if item_to_reco not in items_in_cart:
+            send_notification(user_id,
+                                              "Just for you",
+                                              "How about something a little better?"
+                                              + "\n" + item_to_reco_name,
+                                              item_to_reco
+                                              )
+    # only the cheapest items
+    elif profile_pref == 'SAVER':
+        item_to_reco = recommend_cheapest(item_id, item_cat)
+        item_to_reco_name = firestore_utility.get_firebase_document_ref("items", item_to_reco).get(field_paths={"name"}).to_dict()[
+            'name']
+        if item_to_reco not in items_in_cart:
+            send_notification(user_id,
+                                              "Just for you",
+                                              "How about something a little cheaper?"
+                                              + "\n" + item_to_reco_name,
+                                              item_to_reco
+                                              )
+    # only promotion items and the cheapest promo item
+    elif profile_pref == 'MODERATE':
+        item_to_reco = recommend_promotion(item_id, item_cat)
+        item_to_reco_name = firestore_utility.get_firebase_document_ref("items", item_to_reco).get(field_paths={"name"}).to_dict()[
+            'name']
+        print(item_to_reco)
+        if item_to_reco not in items_in_cart:
+            send_notification(user_id,
+                                              "Just for you",
+                                              "How about this promotion item?"
+                                              + "\n" + item_to_reco_name,
+                                              item_to_reco
+                                              )
+
+    # CEREAL RECCO
+
+    # if the item put in is CEREAL
+    if item_id == 'RMWLUuACH72OuqSPYQDk' or item_id == 'rxRod7cigQjBK9dDmlHv':
+        # check for presence of milk
+        print("CEREAL ITEM ID CHECK:" , item_id)
+        if 'OyVCNQgJ80lWy9HjbpvF' in items_in_cart or 'VfgrHcX6LvHuAvkJtdgU' in items_in_cart:
+            pass
+        else:
+            item_to_reco = recommend_milk_from_cereal()
+            item_to_reco_name = firestore_utility.get_firebase_document_ref("items", item_to_reco).get(field_paths={"name"}).to_dict()[
+            'name']
+            send_notification(user_id,
+                                              "I sense cereal!",
+                                              "Would you like this to go with..."
+                                              + "\n" + item_to_reco_name,
+                                              item_to_reco
+                                              )
