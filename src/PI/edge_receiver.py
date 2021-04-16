@@ -1,7 +1,7 @@
 import firestore_utility
 import excel_utility
 import serial, pprint
-import recommendations
+import recommendation_utility
 
 def update_cart_items(cart_name: str, cart_items: dict):
     """
@@ -86,7 +86,7 @@ if __name__ == '__main__':
                     cart_session[cart_name][item] = 1
 
                 user_id = get_cart_current_user(cart_name)
-                recommendations.trigger_recommendations(user_id, item)
+                recommendation_utility.trigger_recommendations(user_id, item)
 
             elif(command == 'R'):
                 cart_session[cart_name][item] -= 1
