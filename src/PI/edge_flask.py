@@ -1,6 +1,7 @@
 from flask import Flask, redirect, url_for, request
 import firestore_utility
 import path_utility
+import recommendation_utility
 import json, pprint
 
 app = Flask(__name__)
@@ -46,7 +47,10 @@ def path():
     recommend_trigger = item_in_path - user_incart_items
     print(f"Item in path: {item_in_path}")
     print(f"Item in cart: {user_incart_items}")
-    print(f"Item to trigger recommendation: {recommend_trigger}") # TO-DO add recommendation api call here
+    print(f"Item to trigger recommendation: {recommend_trigger}")
+    for item in recommend_trigger:
+        recommendation_utility.trigger_recommendations(user , item)
+
     return json.dumps({'item':item,'path':path})
 
 @app.route('/path2')

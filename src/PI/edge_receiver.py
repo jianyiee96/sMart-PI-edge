@@ -1,6 +1,7 @@
 import firestore_utility
 import excel_utility
 import serial, pprint
+import recommendation_utility
 
 def update_cart_items(cart_name: str, cart_items: dict):
     """
@@ -21,7 +22,7 @@ def update_cart_items(cart_name: str, cart_items: dict):
         return None
 
     cart_items_ref = firestore_utility.get_firebase_document_ref("users", user_id).collection("cartItems")
-    
+
     items = cart_items_ref.stream()
     
     for item in items:
@@ -60,7 +61,7 @@ if __name__ == '__main__':
     ser = serial.Serial(port='COM11', baudrate=115200, timeout=1)
     print("PI-EDGE is running.. Listening on serial port.")
     while True:
-        
+
         response = ser.readline()
         response = response.decode('utf-8').strip()
         if(response != '' and response[0] == '>'):
@@ -84,10 +85,8 @@ if __name__ == '__main__':
                 else:
                     cart_session[cart_name][item] = 1
 
-                # TO-DO add recommendation api call here
-                # Find the user_id based on cart_name using the mapping. USE: get_cart_current_user
-                # Use firestore_utility to get user' incart item
-                # Added MILO. Want to recommend HOLICK. Check if user has holick in his shopping list / cart. 
+                user_id = get_cart_current_user(cart_name)
+                recommendation_utility.trigger_recommendations(user_id, item)
 
             elif(command == 'R'):
                 cart_session[cart_name][item] -= 1
