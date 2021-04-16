@@ -20,12 +20,16 @@ def path():
     oy = request.args.get('oy')
     item = request.args.get('item')
     user = request.args.get('user')
-    try:
-        dx = global_items[item]['posX']
-        dy = global_items[item]['posY']
-    except:
-        dx = 0
+    if item == 'EXIT':
+        dx = 99
         dy = 0
+    else:
+        try:
+            dx = global_items[item]['posX']
+            dy = global_items[item]['posY']
+        except:
+            dx = 99
+            dy = 0
 
     print(f"Path request: {ox},{oy} to {dx},{dy}")
     path = path_utility.get_path(int(ox), int(oy), int(dx), int(dy))
@@ -54,7 +58,7 @@ def path_ui():
         dx = global_items[item]['posX']
         dy = global_items[item]['posY']
     except:
-        dx = 0
+        dx = 99
         dy = 0
 
     print(f"UI Path request: {ox},{oy} to {dx},{dy}")
@@ -97,32 +101,6 @@ def init_navigate():
     except:
         return json.dumps({'status':-1})
 
-@app.route('/is4151grade')
-def grade():
-    from random import randrange
-    x = randrange(10)
-    if x == 0:
-        return "A+"
-    elif x == 1: 
-        return "A"
-    elif x == 2:
-        return "A-"
-    elif x == 3:
-        return "B+"
-    elif x == 4:
-        return "B"
-    elif x == 5:
-        return "B-"
-    elif x == 6:
-        return "C"
-    elif x == 7:
-        return "D"
-    elif x == 8:
-        return "E"
-    elif x == 9:
-        return "F"
-    else:
-        return "F-"
 
 if __name__ == '__main__':
     app.run(debug = True)
