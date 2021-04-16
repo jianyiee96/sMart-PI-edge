@@ -53,25 +53,21 @@ Connect Micro:bit edge device to Raspberry PI using USB.
 
 ##### Source Codes:
 
-###### /PI
+###### /edge-processor
 
 | File                 	| Description                                       	|
 |----------------------	|---------------------------------------------------	|
 | edge_receiver.py     	| Main executable file for Raspberry PI device      	|
+| edge_flask.py         | Flask Web Server for sMart                            |
 | excel_utility.py     	| Utility tool for reading sheets from mapping.xlsx 	|
 | firestore_utility.py 	| Utility tool for connection with Firestore        	|
-| edge_flask.py         | Flask Web Server for sMart                            |
+| recommendation_utility.py 	| Utility tool for recommendation logic and triggers|
+| path_utility.py 	    | Utility tool for path generation logic and tools      |
+| micro-edge.js         | Receives data from micro-cart and relay to edge_receiver.py through USB Serial |
 
-###### /Arduino
-
-| File             	| Description                                                                                                                                      	|
-|------------------	|--------------------------------------------------------------------------------------------------------------------------------------------------	|
-| arduino-cart.ino 	| Reads from RC522 and transmit data to micro:bit using SoftwareSerial.<<br>Requires MFRC522 library installed through Arduino library manager. 	|
-
-###### /Microbit
+###### /sMart-cart
 
 | File                     	| Description                                                                                                   	|
 |--------------------------	|---------------------------------------------------------------------------------------------------------------	|
+| arduino-cart.ino 	| Reads from RC522 and transmit data to micro:bit using SoftwareSerial.<<br>Requires MFRC522 library installed through Arduino library manager. 	|
 | micro-cart.js            	| Maintains the item state of cart. <br>Receives data from Arduino and relay actions to micro-edge through radio   	|
-| micro-edge.js            	| Receives data from micro-cart and relay to edge_receiver.py through USB Serial                                	|
-| micro-cart-simulation.js 	| Simulates adding and removing items from cart<br>Transmit actions to edge_receiver.py through USB Serial      	|
